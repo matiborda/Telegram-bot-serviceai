@@ -2,6 +2,7 @@ import os
 import logging
 import asyncio
 import json
+import traceback
 
 from flask import Flask, request, abort     # ← importa request y abort
 from dotenv import load_dotenv
@@ -149,10 +150,17 @@ def health_check():
 def webhook():
     if request.headers.get("content-type") != "application/json":
         abort(400)
-    update = Update.de_json(request.get_json(force=True), application.bot)
-    # Procesar sin bloquear el hilo de Flask
-    asyncio.create_task(application.process_update(update))
-    return "OK"
+    data = request.get_json(force=True)
+    update = Update.de_json(data, application.bot)
+    try:
+        # Procesa la actualización y espera a que termine
+        asyncio.get_event_loop().create_task(application.process_update(update))
+    except Exception as e:
+        # Imprime el traceback completo en los logs de Render
+        app.logger.error("Error en process_update:\n" + traceback.format_exc())
+        # Devuelve 200 a Telegram para no generar reintentos infinitos
+        return "OK", 200
+    return "OK", 200
 
 # ─── 6. Inicio local y configuración del webhook ────────────────────────
 if __name__ == "__main__":
