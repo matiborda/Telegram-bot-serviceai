@@ -1,0 +1,29 @@
+# Entorno virtual
+venv/
+.env
+.env.local
+.env.*
+*.env
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyd
+*.pyo
+
+# Dependencias
+node_modules/
+dist/
+build/
+*.egg-info/
+
+# Archivos sensibles
+secrets.json
+*.key
+*.cert
+credentials.*
+
+# Editor/IDE
+.vscode/
+.idea/
